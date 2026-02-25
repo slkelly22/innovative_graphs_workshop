@@ -1,0 +1,291 @@
+---
+title: "Beyond the Basics: Innovative Graphs with ggplot2"
+author: "S.Kelly | Scholar Support & Data Services"
+format:
+  revealjs:
+    theme: serif
+    html-math-method:
+      method: mathjax
+      url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    code-overflow: wrap
+    footer: "S.Kelly | Inovative Graphs | Spring 2026"
+editor: visual
+execute: 
+  echo: true
+---
+
+## Opening Slide
+
+## Loading ggplot2
+
+You can load ggplot2 directly but it's often more advantageous to load the entire tidyverse suite of packages.
+
+```{r}
+#install.packages("tidyverse")
+library(tidyverse)
+```
+
+## Let's Simulate Data!
+
+We're going to create a fake dataset about maple trees.
+
+```{r}
+maples <- data.frame(height = rnorm(10000, 25, 1.9), 
+                     crown = rnorm(10000, 10, 0.8))
+
+head(maples)
+```
+
+## Basic scatterplot of the tree data
+
+Can we read this plot well? 
+
+```{r}
+ggplot(maples, aes(x = height, y = crown)) + geom_point()
+```
+
+## Alternatives to a Scatterplot
+
+`Overplotting` is a common issue when you're trying to understand the relationship betwen two numerical variables but you have thousands of data points. 
+<br>
+<br>
+An alternative plot is to create a `Heatmap of 2 Dimensional Bin Counts`. This is done with `geom_bin_2d` in ggplot. 
+
+## Basic 2d plot
+
+```{r}
+ggplot(maples, aes(x = height, y = crown)) + geom_bin_2d() 
+```
+
+## Let's add a viridis color scheme
+
+```{r}
+ggplot(maples, aes(x = height, y = crown)) + geom_bin_2d() + 
+  scale_fill_viridis_c()
+```
+
+## What if we want a specific color? 
+
+```{r}
+ggplot(maples, aes(x = height, y = crown)) + geom_bin_2d() + 
+  scale_fill_gradient(low = "#9DC183", high = "#1A2421")
+```
+
+## How would you outline the boxes? 
+
+```{r}
+ggplot(maples, aes(x = height, y = crown)) + geom_bin_2d() + 
+  scale_fill_gradient(low = "#9DC183", high = "#1A2421")
+```
+
+# Like this...
+
+## 
+
+```{r}
+ggplot(maples, aes(x = height, y = crown)) + 
+  geom_bin_2d(color = "lightgrey") + 
+  scale_fill_gradient(low = "#9DC183", high = "#1A2421")  
+```
+
+# Let's add a theme and labels...
+
+##
+
+```{r}
+ggplot(maples, aes(x = height, y = crown)) + 
+  geom_bin_2d(color = "lightgrey") + 
+  scale_fill_gradient(low = "#9DC183", high = "#1A2421")  + 
+  labs(x = "Tree Height", y = "Tree Crown", 
+       title = "Relationship between Maple Tree Height and Crown", 
+       fill = "# of Trees") + theme_bw()
+```
+
+## 2D Bins - but with hexagons! 
+
+```{r}
+ggplot(maples, aes(x = height, y = crown)) + geom_hex()
+```
+
+# Let's pretend we have bee data...
+
+## 
+
+```{r}
+ggplot(maples, aes(x = height, y = crown)) + 
+  geom_hex(color = "grey") + 
+  scale_fill_gradient(low = "#FFF200", high = "#737000")
+
+```
+
+## Multiple Geoms   
+
+What's so great about ggplot is that you can combine geoms. 
+<br>
+<br>
+What would happen if we combine a `geom_bin_2d` and a `geom_point`? 
+
+## What am I doing here?
+
+```{r}
+ggplot(maples, aes(x = height, y = crown)) + geom_bin_2d() + 
+  geom_point(color = "white", shape = ".")
+```
+
+## Outline the Boxes
+
+```{r}
+ggplot(maples, aes(x = height, y = crown)) + geom_bin_2d(color = "grey") +
+  geom_point(color = "white", shape = ".") 
+```
+
+# With a title, theme, and no legend
+
+##
+
+```{r}
+ggplot(maples, aes(x = height, y = crown)) + geom_bin_2d(color = "grey") +
+  geom_point(color = "white", shape = ".") + 
+  labs(x = "Tree Height", y = "Tree Crown", 
+       title = "Relationship between Maple Tree Height and Crown", 
+       fill = "Count") + 
+  theme_classic() + theme(legend.position = "none")
+```
+
+# Next up: Lollipop
+
+## Simulating Data
+
+I'm going to create a dataset of 30 students with fake GPAs. 
+
+```{r}
+students <- data.frame(id = seq(1:30), 
+                       gpa = rnorm(30, 2.8, .5)) 
+```
+
+## Lollipop Plot
+
+A basic `lollipop` combines a geom_point() with a geom_segment(). The hardest thing to remember is setting up the geom_segment which requires arguments for `x, y, xend, yend` and are set within the aesthetics of the geom_segment. 
+<br>
+<br>
+Let's see what this looks like. 
+
+## Basic Lollipop Plot
+
+```{r}
+ggplot(students, aes(x = id, y = gpa)) + geom_point() + 
+  geom_segment(aes(x = id, y = 0, xend = id, yend = gpa))
+```
+
+## Let's change the Points
+
+```{r}
+ggplot(students, aes(x = id, y = gpa)) + geom_point(size = 4.5, color = "red") +
+  geom_segment(aes(x = id, y = 0, xend = id, yend = gpa))
+```
+
+## Let's change the Lines
+```{r}
+ggplot(students, aes(x = id, y = gpa)) + geom_point(size = 4.5, color = "red") + 
+  geom_segment(aes(x = id, y = 0, xend = id, yend = gpa), 
+               linetype = "dotdash")
+```
+
+## Changing the Reference Point 
+
+My absolute favorite thing about the lollipop is that you can change the reference point. 
+<br>
+<br>
+Let's say that a 3.0 GPA is critical for students who need to stay on scholarship. We can change our lollipop to reflect that...
+
+## What if 3.0 GPA is critical? 
+
+```{r}
+ggplot(students, aes(x = id, y = gpa)) + geom_point(size = 4.5, color = "red") + 
+  geom_segment(aes(x = id, y = 3, xend = id, yend = gpa), linetype = "dotdash")
+```
+
+# That's great, but can we make it more obvious? 
+
+## 
+```{r}
+ggplot(students, aes(x = id, y = gpa)) + geom_point(size = 4.5, color = "red") +
+  geom_segment(aes(x = id, y = 3, xend = id, yend = gpa), 
+               linetype = "dotdash") + geom_hline(yintercept = 3)
+```
+
+## Finishing Touches
+
+Let's finish the plot by adding the labels argument and adding a different x scale to highlight each individual students. We'll do these things with the `labs` and `scale_x_continuous` functions. 
+
+##
+
+```{r}
+ggplot(students, aes(x = id, y = gpa)) + geom_point(size = 4.5, color = "red") +
+  geom_segment(aes(x = id, y = 3, xend = id, yend = gpa), 
+               linetype = "dotdash") + geom_hline(yintercept = 3) + 
+  labs(title = "Who is at risk of losing their scholarship?", 
+       x = "Student ID", y = "GPA") + 
+  scale_x_continuous(breaks = c(1:30))
+```
+
+# Ridgeline 
+
+## Ridgeline Plots
+
+Ridgeline plots are helpful when you want to show the distribution of a continuous variable across a factor or character variable. 
+<br>
+<br>
+Generally you can do this by creating a density plot and then using a facet wrap. 
+
+## Penguin Data
+
+```{r}
+# install.packages("palmerpenguins")
+library(palmerpenguins)
+ggplot(penguins, aes(x = bill_length_mm)) + geom_density(aes(fill = species)) +
+  facet_wrap(~species)
+```
+
+## But this is the same data with a ridgeline plot
+
+```{r}
+#| echo: FALSE
+library(ggridges)
+ggplot(penguins, aes(x = bill_length_mm, y = species, fill = species)) + geom_density_ridges(alpha = 0.8) + theme_ridges() + theme(legend.position = "none") + labs(y = NULL, x = NULL, title = "Penguin Bill Length by Species") + scale_fill_viridis_d()
+```
+
+## Package: ggridges
+
+There is a companion package to `gglot2` called `ggridges` and that's how we'll make the final plot. Let's install and load. 
+
+```{r}
+# install.packages("ggridges")
+library(ggridges)
+```
+
+## Ridgeline Plot
+
+```{r}
+ggplot(penguins, aes(x = bill_length_mm, y = species, fill = species)) +
+  geom_density_ridges(alpha = 0.8)
+```
+
+## Now with a new color
+
+```{r}
+ggplot(penguins, aes(x = bill_length_mm, y = species, fill = species)) +
+  geom_density_ridges(alpha = 0.8) + scale_fill_viridis_d()
+```
+
+# Final plot with a theme and labels
+
+## 
+```{r}
+ggplot(penguins, aes(x = bill_length_mm, y = species, fill = species)) +
+  geom_density_ridges(alpha = 0.8) + scale_fill_viridis_d() +
+  theme_ridges() + theme(legend.position = "none") + 
+  labs(y = NULL, x = NULL, title = "Penguin Bill Length by Species") 
+```
+
+## Closing Slide with QR code
